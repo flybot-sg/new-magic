@@ -9,32 +9,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    # Setup .Net
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 7.0.x
-    
     # Checkout repo
     - name: Checkout MAGIC repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
+
+    # Setup .Net
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
       with:
-        repository: magic-clojure/magic
-        path: ./magic
-    
+        dotnet-version: 7.0.x
+
     # Build Everything
     - name: Building and Bootstraping MAGIC
       run: cd magic && dotnet build
-      
-   # Store nostrand and magic.unity as artifacts for 90 days
+
+    # Store nostrand and magic.unity as artifacts for 90 days
     - name: Store Nostrand as a github artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: nostrand
         path: ./magic/nostrand/bin/x64/Release/net471/
-    
-    - name: Store Magic.Unity as a github artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: magic.unity
-        path: ./magic/magic.unity/
