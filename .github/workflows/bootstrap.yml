@@ -21,11 +21,11 @@ jobs:
 
     # Build Everything
     - name: Building and Bootstraping MAGIC
-      run: cd magic && dotnet build
+      run: dotnet build
 
     # Store nostrand and magic.unity as artifacts for 90 days
     - name: Store Nostrand as a github artifact
       uses: actions/upload-artifact@v3
       with:
         name: nostrand
-        path: ./magic/nostrand/bin/x64/Release/net471/
+        path: ./nostrand/bin/Release/net471/
