@@ -73,10 +73,23 @@
     :else
     (compile-expression expr ctx opts)))
 
-(defn clojure-clr-init-class-name
+(defn module-name-of
+  "returns a name for "
+  [module]
+  (-> module
+      str
+      (string/replace "/" ".")
+      (str ".clj")))
+
+(defn class-name-of
   "Port of clojure.lang.Compiler/InitClassName"
-  [path]
-  (str "__Init__$" (-> path (string/replace "." "/") (string/replace "/" "$"))))
+  [module-name]
+  (str "__Init__$" (-> module-name (string/replace "." "/") (string/replace "/" "$"))))
+
+(comment
+  (module-name-of "hello")
+  (class-name-of "hello")
+  )
 
 (defn compile-file
   ([path module]
@@ -84,15 +97,12 @@
   ([path module opts]
    (when-not (:suppress-print-forms opts)
      (println "[compile-file] start" path))
-   (let [module-name (-> module
-                         str
-                         (string/replace "/" ".")
-                         (str ".clj"))]
+   (let [module-name (module-name-of module)]
      (binding [*print-meta*            false
                *ns*                    *ns*
                *file*                  path
                magic.emission/*module* (magic.emission/fresh-module module-name)]
-       (let [type-name        (clojure-clr-init-class-name module)
+       (let [type-name        (class-name-of module)
              ns-type          (.DefineType magic.emission/*module* type-name abstract-sealed)
              init-method      (.DefineMethod ns-type "Initialize" public-static)
              init-ilg         (.GetILGenerator init-method)
@@ -155,6 +165,9 @@
       (recur (.Message e') (ex-data e') (or (-> (ex-data e') :meta :source-span) source-span) (or (:file (ex-data e') file)))
       (throw (clojure.lang.ClojureException. 
               (str message (:name data) " (compiling " file ":" (:start-line source-span) ":" (:start-column source-span) ")"))))))
+
+;-----------------------------------------------
+; To be bound to clojure.core's dynamic bindings
 
 (defn eval [expr]
   (try

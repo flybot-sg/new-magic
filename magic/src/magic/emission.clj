@@ -1,4 +1,5 @@
 (ns magic.emission
+  (:require [clojure.string :as string]) 
   (:import [System.Reflection AssemblyName]
            [System.Reflection.Emit AssemblyBuilderAccess]))
 
