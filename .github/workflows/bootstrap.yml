@@ -20,6 +20,7 @@ jobs:
     - name: Reuse previous nostrand version
       uses: actions/download-artifact@v3
       with:
+        name: nostrand
         path: downloads
 
     - name: Use downloaded(previous built) for building
@@ -30,7 +31,6 @@ jobs:
 
     - name: Store Nostrand as a github artifact
       uses: actions/upload-artifact@v3
-      needs: build
       with:
         name: nostrand
         path: ./nostrand/bin/Release/net471/
