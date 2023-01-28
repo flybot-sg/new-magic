@@ -19,9 +19,11 @@ jobs:
 
     - name: Reuse previous nostrand version
       uses: actions/download-artifact@v3
+      with:
+        path: downloads
 
     - name: Use downloaded(previous built) for building
-      run: rm -rf nostrand/references && mv nostrand nostrand/references
+      run: rm -rf nostrand/references && mv downloads/nostrand nostrand/references
 
     - name: Building and Bootstraping MAGIC
       run: dotnet build
