@@ -65,12 +65,9 @@
 (defn compile-expression-top-level [expr ctx opts]
   (when-not (:suppress-print-forms opts)
     (println "[compile-expression-top-level]" expr))
-  (cond
-    (and (seq? expr)
-         (= 'do (first expr)))
-    (doseq [expr' (drop 1 expr)]
-      (compile-expression-top-level expr' ctx opts))
-    :else
+  (if (and (seq? expr)
+           (= 'do (first expr)))
+    (recur (rest expr) ctx opts)
     (compile-expression expr ctx opts)))
 
 (defn module-name-of
@@ -91,6 +88,20 @@
   (class-name-of "hello")
   )
 
+(defn- save-to-path [module-name opts path]
+  (let [compile-path (or *compile-path* ".")
+        file-name    (str module-name ".dll")
+        final-path   (Path/Combine compile-path file-name)]
+    (Directory/CreateDirectory compile-path)
+    (if-not (File/Exists final-path)
+      (let [assembly (.Assembly magic.emission/*module*)]
+        (Magic.Emission/EmitAssembly assembly file-name)
+        (when-not (= compile-path ".")
+          (File/Move file-name final-path)))
+      (println "[compile-file] file already exists" final-path))
+    (when-not (:suppress-print-forms opts)
+      (println "[compile-file] end" path "->" final-path))))
+
 (defn compile-file
   ([path module]
    (compile-file path module nil))
@@ -110,8 +121,7 @@
                                ::il/type-builder   ns-type
                                ::il/method-builder init-method
                                ::il/ilg            init-ilg}
-             file             (System.IO.File/OpenText path)
-             module-file-name (str module-name ".dll")]
+             file             (System.IO.File/OpenText path)]
          (try
            (let [rdr    (LineNumberingTextReader. file)
                  read-1 (fn [] (try (read read-options rdr) (catch Exception _ nil)))]
@@ -125,18 +135,7 @@
          (il/emit! ctx (il/ret))
          (.CreateType ns-type)
          (when (:write-files opts)
-           (let [compile-path (or *compile-path* ".")
-                 file-name    module-file-name
-                 final-path   (Path/Combine compile-path file-name)]
-             (Directory/CreateDirectory compile-path)
-             (if-not (File/Exists final-path)
-               (let [assembly (.Assembly magic.emission/*module*)]
-                 (Magic.Emission/EmitAssembly assembly file-name)
-                 (when-not (= compile-path ".")
-                   (File/Move file-name final-path)))
-               (println "[compile-file] file already exists" final-path))
-             (when-not (:suppress-print-forms opts)
-               (println "[compile-file] end" path "->" final-path)))))))))
+           (save-to-path module-name opts path)))))))
 
 (defn compile-namespace
   "Keys in opts:
@@ -162,7 +161,7 @@
          source-span (-> data :meta :source-span)
          file (:file data)]
     (if-let [e' (:exception data)]
-      (recur (.Message e') (ex-data e') (or (-> (ex-data e') :meta :source-span) source-span) (or (:file (ex-data e') file)))
+      (recur (.Message e') (ex-data e') (or (-> (ex-data e') :meta :source-span) source-span) (or (:file (ex-data e')) file))
       (throw (clojure.lang.ClojureException. 
               (str message (:name data) " (compiling " file ":" (:start-line source-span) ":" (:start-column source-span) ")"))))))
 
