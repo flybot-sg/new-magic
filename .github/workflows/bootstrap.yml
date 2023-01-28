@@ -30,6 +30,7 @@ jobs:
 
     - name: Store Nostrand as a github artifact
       uses: actions/upload-artifact@v3
+      needs: build
       with:
         name: nostrand
         path: ./nostrand/bin/Release/net471/
