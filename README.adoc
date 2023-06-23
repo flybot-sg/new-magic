@@ -2,7 +2,7 @@
 
 ## Rational
 
-https://github.com/magic-clojure/magic[The original repository] uses a clone approach which devides source code into different git repositories:
+https://github.com/magic-clojure/magic[The original repository] uses a clone approach which divides source code into different git repositories:
 
 [cols="1,1"]
 |===
@@ -10,7 +10,7 @@ https://github.com/magic-clojure/magic[The original repository] uses a clone app
 | Multiple Repositories
 
 a|
- - easy to maitain
+ - easy to maintain
  - can have a single CI pipeline  
 a|
  - have individual history for different components
@@ -21,9 +21,9 @@ The build pipeline for the https://github.com/nasser/magic[Morgan And Grand Iron
 
 This repository aims to simplify ongoing work on MAGIC by providing a single place to reproducibly build the compiler, its dependencies, and dependents.
 
-## Subprojects
+## Sub-projects
 
-MAGIC is a complex project consisting of multiple subprojects hosted in their own repositories with their own histories
+MAGIC is a complex project consisting of multiple sub-projects hosted in their own repositories with their own histories
 
 ### Clojure.Runtime
 
@@ -71,24 +71,36 @@ It is a C# codebase hosted at https://github.com/nasser/Magic.Unity[nasser/Magic
 
 [source,bash]
 ----
-git clone https://github.com/magic-clojure/magic.git
-cd magic
+git clone https://github.com/flybot-sg/new-magic
+cd new-magic
 dotnet build
 ----
 
-This will clone MAGIC and its subprojects locally, then build and bootstrap them in the correct order. The result should be the following folders corresponding to the subprojects:
+This will clone MAGIC and its sub-projects locally, then build and bootstrap them in the correct order. The result should be the following folders corresponding to the subprojects:
 
 * `clojure.runtime`
 * `magic.runtime`
 * `magic`
 * `nostrand`
-* `magic.unity`
 
-A usable Nostrand executable should be available at `nostrand/bin/x64/Release/net471/Nostrand.exe` which can be used with mono to run tasks and compile Clojure code to optimized DLL files. These files can be used in a Unity project that uses the integration found in the `magic.unity` folder. The other folders are of interest to compiler developers only.
+A usable Nostrand executable should be available at `nostrand/bin/x64/Release/net471/NostrandMain.exe` which can be used with mono to run tasks and compile Clojure code to optimized DLL files.
+
+You can use `nos` by adding to your path: `.../new-magic/nostrand/bin/Release/net471`
+
+To verify that everything is setup properly, you can run:
+
+```
+nos version
+;=>
+Nostrand 1.0.0+e6ab32d3
+Clojure.Runtime 1.10.0.0+3bd47b31
+Magic.Runtime 1.0.0+33e9131a
+Clojure 1.10.0-master-SNAPSHOT
+```
 
 ## Legal
 
-Copyright © 2015-2022 Ramsey Nasser and contributers
+Copyright © 2015-2022 Ramsey Nasser and contributors
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
