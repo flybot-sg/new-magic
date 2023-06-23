@@ -1,2 +1,8 @@
 .clj-kondo/
 .lsp/
+
+## Repos
+clojure.runtime
+magic.runtime
+magic
+nostrand
