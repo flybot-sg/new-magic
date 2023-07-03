@@ -1,21 +1,8 @@
-# Monolith MAGIC Build Pipeline
+# MAGIC Build Pipeline
 
 ## Rational
 
-https://github.com/magic-clojure/magic[The original repository] uses a clone approach which divides source code into different git repositories:
-
-[cols="1,1"]
-|===
-| Monolith
-| Multiple Repositories
-
-a|
- - easy to maintain
- - can have a single CI pipeline  
-a|
- - have individual history for different components
- - if keep syncing with upstream git repository, could trace/follow them
-|===
+https://github.com/magic-clojure/magic[The original repository] does not work on mac. This pipeline works on mac.
 
 The build pipeline for the https://github.com/nasser/magic[Morgan And Grand Iron Clojure] compiler.
 
@@ -61,6 +48,12 @@ An integration package to get MAGIC compiled Clojure code running in Unity games
 
 It is a C# codebase hosted at https://github.com/nasser/Magic.Unity[nasser/Magic.Unity] and can be built with the `dotnet` command line tool. It includes bytecode post-processing to work around Unity specific issues with MAGIC compiled code.
 
+`Magic.Unity` is not included in the pipeline because it can be import directly in unity via the manifest.json:
+
+```
+"sr.nas.magic.unity": "https://github.com/nasser/Magic.Unity.git"
+```
+
 ## Requirements
 
 * https://git-scm.com/[git]
@@ -73,10 +66,12 @@ It is a C# codebase hosted at https://github.com/nasser/Magic.Unity[nasser/Magic
 ----
 git clone https://github.com/flybot-sg/new-magic
 cd new-magic
+dotnet build -t:CleanRepos
+dotnet clean
 dotnet build
 ----
 
-This will clone MAGIC and its sub-projects locally, then build and bootstrap them in the correct order. The result should be the following folders corresponding to the subprojects:
+This will clone MAGIC and its sub-projects locally, then build and bootstrap them in the correct order. The result should be the following folders corresponding to the sub-projects:
 
 * `clojure.runtime`
 * `magic.runtime`
